@@ -224,50 +224,77 @@
         }, { passive: false });
 
         // Start Blazor after KNI's browser-side modules have loaded.
-        // Track boot resource downloads so the loading screen shows progress
-        // instead of a silent black page during the large WASM fetch.
+        // Show real download progress on the loading screen: read the expected
+        // byte total from blazor.boot.json, then poll the Resource Timing API
+        // for the bytes actually transferred.
         (function () {
             var status = document.getElementById('loadingStatus');
             var fill = document.getElementById('loadingBarFill');
-            var loaded = 0, totalBytes = 0, loadedBytes = 0, seen = 0;
-            function update() {
-                if (fill) {
-                    var pct = totalBytes > 0
-                        ? Math.min(100, Math.round(loadedBytes / totalBytes * 100))
-                        : Math.min(seen * 4, 95);
-                    fill.style.width = pct + '%';
-                }
+            var totalBytes = 0, loadedBytes = 0, done = false;
+
+            function render() {
+                var pct = totalBytes > 0
+                    ? Math.min(100, Math.round(loadedBytes / totalBytes * 100))
+                    : 0;
+                if (fill) fill.style.width = pct + '%';
                 if (status) {
-                    var mb = (loadedBytes / 1048576).toFixed(1);
                     status.textContent = totalBytes > 0
-                        ? 'Loading… ' + mb + ' MB'
+                        ? 'Loading… ' + (loadedBytes / 1048576).toFixed(1)
+                            + ' / ' + (totalBytes / 1048576).toFixed(1) + ' MB'
                         : 'Loading…';
                 }
             }
-            window.warhookBootProgress = function (bytes) {
-                seen++;
-                if (bytes) {
-                    totalBytes += bytes.total;
-                    loadedBytes += bytes.loaded;
-                }
-                update();
-            };
-            var start = Blazor.start({
-                loadBootResource: function (type, name, url, contentHash) {
-                    // Must return a URI string for this Blazor version.
-                    // Observe the download separately for progress display.
-                    if (url) {
-                        fetch(url, { method: 'HEAD' }).then(function (r) {
-                            var len = parseInt(r.headers.get('content-length') || '0', 10);
-                            if (len > 0) window.warhookBootProgress({ total: len, loaded: len });
-                        }).catch(function () { });
+
+            // blazor.boot.json lists resource names but not sizes, so HEAD
+            // each one to learn the real total download size.
+            fetch('_framework/blazor.boot.json', { cache: 'no-cache' })
+                .then(function (r) { return r.json(); })
+                .then(function (boot) {
+                    var names = [];
+                    var res = boot.resources || {};
+                    for (var group in res) {
+                        var entries = res[group];
+                        if (!entries || typeof entries !== 'object') continue;
+                        for (var name in entries) names.push(name);
                     }
-                    return url;
+                    return Promise.all(names.map(function (name) {
+                        return fetch('_framework/' + name, { method: 'HEAD' })
+                            .then(function (r) {
+                                return parseInt(r.headers.get('content-length') || '0', 10) || 0;
+                            })
+                            .catch(function () { return 0; });
+                    }));
+                })
+                .then(function (sizes) {
+                    for (var i = 0; i < sizes.length; i++) totalBytes += sizes[i];
+                    render();
+                })
+                .catch(function () { });
+
+            // Poll actual transferred bytes for framework resources.
+            function poll() {
+                if (done) return;
+                var entries = performance.getEntriesByType('resource');
+                var sum = 0;
+                for (var i = 0; i < entries.length; i++) {
+                    var e = entries[i];
+                    if (e.name.indexOf('_framework/') === -1) continue;
+                    // transferSize is 0 for cached responses; fall back to
+                    // decodedBodySize so a warm cache still shows progress.
+                    sum += e.transferSize || e.decodedBodySize || 0;
                 }
+                if (sum > loadedBytes) loadedBytes = sum;
+                render();
+                setTimeout(poll, 200);
+            }
+            poll();
+
+            var start = Blazor.start();
+            start.then(function () {
+                done = true;
+                loadedBytes = totalBytes;
+                render();
             });
-            // Fallback pulse while resources load without size info.
-            var pulse = setInterval(update, 250);
-            start.then(function () { clearInterval(pulse); update(); });
         })();
     </script>
 </body>
