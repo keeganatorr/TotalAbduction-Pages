@@ -10,16 +10,20 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 </head>
 
-<body>
+<body class="startup-splash">
 
     <div id="app">
         <div id="loading" role="status" aria-live="polite">
-            <canvas id="loadingCanvas" width="384" height="216" aria-label="WarHook loading"></canvas>
+            <span class="visually-hidden">Loading WarHook</span>
         </div>
     </div>
 
     <button id="fullscreenButton" type="button" aria-label="Enter fullscreen">
-        FULLSCREEN
+        <span class="fullscreen-label">FULLSCREEN</span>
+        <svg class="fullscreen-icon" viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M2 7V2h5 M13 2h5v5 M18 13v5h-5 M7 18H2v-5"
+                  fill="none" stroke="currentColor" stroke-width="2" />
+        </svg>
     </button>
 
     <div id="blazor-error-ui">
@@ -29,10 +33,12 @@
     </div>
 
     <script>
-        // localStorage bridge for the high-score store ([JSImport] targets).
+        // Browser bridges used by the game ([JSImport] targets).
         window.warhookInterop = {
             loadSave: function (key) { return localStorage.getItem(key); },
-            saveSave: function (key, json) { localStorage.setItem(key, json); }
+            saveSave: function (key, json) { localStorage.setItem(key, json); },
+            finishStartupSplash: function () { document.body.classList.remove('startup-splash'); },
+            setUpgradeView: function (active) { document.body.classList.toggle('upgrade-view', active); }
         };
 
         // Wrap AudioContext so the game's context (created before any user
@@ -99,92 +105,6 @@
     <script src="_content/nkast.Wasm.XR/js/XR.10.0.3.js"></script>
 
     <script>
-        // Draw the boot screen from the same 8x8 atlas used by the game's
-        // main menu. Blazor replaces #loading when the game component starts.
-        (function () {
-            var canvas = document.getElementById('loadingCanvas');
-            var loading = document.getElementById('loading');
-            if (!canvas || !loading) return;
-            var context = canvas.getContext('2d');
-            var atlas = new Image();
-            var atlasReady = false;
-            var started = performance.now();
-            var progress = 4;
-            var phases = [
-                'Loading WebAssembly',
-                'Loading game assets',
-                'Preparing graphics',
-                'Starting WarHook'
-            ];
-
-            atlas.onload = function () {
-                atlasReady = true;
-                draw();
-            };
-            atlas.src = 'Assets/font8x8_atlas.png';
-
-            function drawText(text, x, y, scale, color) {
-                if (!atlasReady) return;
-                context.save();
-                context.imageSmoothingEnabled = false;
-                context.globalAlpha = 1;
-                for (var i = 0; i < text.length; i++) {
-                    var code = text.charCodeAt(i) - 32;
-                    if (code < 0 || code >= 95) code = '?' .charCodeAt(0) - 32;
-                    var sourceX = (code % 16) * 8;
-                    var sourceY = Math.floor(code / 16) * 8;
-                    context.drawImage(atlas, sourceX, sourceY, 8, 8,
-                        x + i * 8 * scale, y, 8 * scale, 8 * scale);
-                }
-                context.restore();
-            }
-
-            function centered(text, y, scale, color) {
-                drawText(text, (canvas.width - text.length * 8 * scale) / 2, y, scale, color);
-            }
-
-            function draw() {
-                context.fillStyle = '#050604';
-                context.fillRect(0, 0, canvas.width, canvas.height);
-
-                var dots = '.'.repeat(1 + Math.floor((performance.now() - started) / 400) % 3);
-                centered('Loading' + dots, 55, 3, '#ffe191');
-
-                var barX = 36, barY = 105, barWidth = canvas.width - 72, barHeight = 9;
-                context.fillStyle = '#382d17';
-                context.fillRect(barX, barY, barWidth, barHeight);
-                context.strokeStyle = '#ffe191';
-                context.lineWidth = 1;
-                context.strokeRect(barX + .5, barY + .5, barWidth - 1, barHeight - 1);
-                context.fillStyle = '#ffe191';
-                context.fillRect(barX + 2, barY + 2,
-                    Math.max(0, (barWidth - 4) * progress / 100), barHeight - 4);
-
-                var phase = phases[Math.min(phases.length - 1,
-                    Math.floor((performance.now() - started) / 3000))];
-                centered(phase, 132, 1, '#ffffff');
-            }
-
-            function animate(now) {
-                if (!document.body.contains(loading)) return;
-                // Keep the bar moving toward completion without pretending that
-                // the browser can report a byte-perfect Blazor download here.
-                progress = Math.min(94, 4 + (now - started) / 12000 * 90);
-                draw();
-                window.requestAnimationFrame(animate);
-            }
-
-            var observer = new MutationObserver(function () {
-                if (document.getElementById('theCanvas')) {
-                    progress = 100;
-                    draw();
-                    observer.disconnect();
-                }
-            });
-            observer.observe(document.getElementById('app'), { childList: true, subtree: true });
-            window.requestAnimationFrame(animate);
-        })();
-
         function tickJS()
         {
             window.theInstance.invokeMethod('TickDotNet');
@@ -249,8 +169,9 @@
 
             function updateButton() {
                 var active = !!fullscreenElement();
-                button.textContent = active ? 'EXIT FULLSCREEN' : 'FULLSCREEN';
+                button.querySelector('.fullscreen-label').textContent = active ? 'EXIT FULLSCREEN' : 'FULLSCREEN';
                 button.setAttribute('aria-label', active ? 'Exit fullscreen' : 'Enter fullscreen');
+                button.title = active ? 'Exit fullscreen' : 'Enter fullscreen';
             }
 
             button.addEventListener('click', function () {
