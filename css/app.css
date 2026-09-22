@@ -12,6 +12,99 @@ html, body {
     position: fixed;
     width: 100vw;
     z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-inner {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    text-align: center;
+}
+
+.loading-title {
+    color: #ffe191;
+    font-family: "Courier New", monospace;
+    font-size: clamp(1rem, 2.5vw, 1.6rem);
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-shadow: 2px 2px #000;
+}
+
+.loading-status {
+    color: #9fb4c7;
+    font-family: "Courier New", monospace;
+    font-size: clamp(0.7rem, 1.4vw, 0.95rem);
+    letter-spacing: 0.08em;
+    min-height: 1.2em;
+}
+
+.loading-bar {
+    background: #171914;
+    border: 2px solid #2c3a4a;
+    height: 14px;
+    width: min(320px, 60vw);
+}
+
+.loading-bar-fill {
+    background: #7fd4ff;
+    height: 100%;
+    transition: width 0.2s ease-out;
+    width: 0%;
+}
+
+/* Tiny UFO hovering over a tractor beam, purely decorative. */
+.loading-ufo {
+    height: 56px;
+    position: relative;
+    width: 96px;
+}
+
+.loading-ufo-body {
+    animation: ufo-hover 2.2s ease-in-out infinite;
+    background: #cfd8e3;
+    border: 2px solid #7fd4ff;
+    border-radius: 50% 50% 45% 45%;
+    height: 18px;
+    left: 18px;
+    position: absolute;
+    top: 14px;
+    width: 60px;
+}
+
+.loading-ufo-body::before {
+    background: #7fd4ff;
+    border-radius: 50%;
+    content: "";
+    height: 10px;
+    left: 20px;
+    position: absolute;
+    top: -7px;
+    width: 20px;
+}
+
+.loading-beam {
+    animation: beam-pulse 2.2s ease-in-out infinite;
+    background: linear-gradient(to bottom, rgba(127, 212, 255, 0.55), rgba(127, 212, 255, 0));
+    clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
+    height: 34px;
+    left: 28px;
+    position: absolute;
+    top: 30px;
+    width: 40px;
+}
+
+@keyframes ufo-hover {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+@keyframes beam-pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
 }
 
 .visually-hidden {
