@@ -1,0 +1,242 @@
+{
+  "style": "Forged Iron",
+  "basedOn": "Iron Night (style index 0)",
+  "looks": {
+    "Forged Iron": {
+      "index": 18,
+      "soldier": "soldier"
+    },
+    "Cartoon Iron": {
+      "index": 19,
+      "soldier": "soldier-cartoon"
+    }
+  },
+  "sampling": "nearest",
+  "assets": {
+    "soldier": {
+      "cell": [
+        24,
+        32
+      ],
+      "columns": 16,
+      "rows": 2,
+      "directions": [
+        90,
+        270
+      ],
+      "framesPerDirection": 16,
+      "facing": [
+        "right",
+        "left"
+      ],
+      "sourceDirections": [
+        90,
+        90
+      ],
+      "flipHorizontal": [
+        true,
+        false
+      ],
+      "fps": 16,
+      "sourceCrop": [
+        22,
+        6,
+        41,
+        57
+      ],
+      "pivot": [
+        12,
+        32
+      ],
+      "job": "soldier",
+      "contentHeight": 32
+    },
+    "soldier-airborne": {
+      "cell": [
+        24,
+        32
+      ],
+      "contentHeight": 32,
+      "pivot": [
+        12,
+        32
+      ],
+      "job": "soldier",
+      "sourceFrame": "voxel/frames/dir-00-frame-00.png",
+      "motion": "runtime articulated arms, legs and torso",
+      "headBottom": 7,
+      "hips": 22,
+      "torso": [
+        9,
+        15
+      ]
+    },
+    "soldier-cartoon": {
+      "cell": [
+        16,
+        16
+      ],
+      "columns": 16,
+      "rows": 2,
+      "directions": [
+        90,
+        270
+      ],
+      "framesPerDirection": 16,
+      "facing": [
+        "right",
+        "left"
+      ],
+      "sourceDirections": [
+        90,
+        90
+      ],
+      "flipHorizontal": [
+        true,
+        false
+      ],
+      "fps": 16,
+      "sourceCrop": [
+        7,
+        3,
+        25,
+        28
+      ],
+      "pivot": [
+        8,
+        16
+      ],
+      "job": "soldier-cartoon-v2",
+      "contentHeight": 14
+    },
+    "soldier-cartoon-airborne": {
+      "cell": [
+        16,
+        16
+      ],
+      "contentHeight": 14,
+      "pivot": [
+        8,
+        16
+      ],
+      "job": "soldier-cartoon-v2",
+      "sourceFrame": "voxel/frames/dir-00-frame-00.png",
+      "motion": "runtime articulated arms, legs and torso",
+      "headBottom": 10,
+      "hips": 13,
+      "torso": [
+        6,
+        10
+      ]
+    },
+    "engineer": {
+      "cell": [
+        24,
+        32
+      ],
+      "columns": 16,
+      "rows": 2,
+      "directions": [
+        90,
+        270
+      ],
+      "framesPerDirection": 16,
+      "facing": [
+        "right",
+        "left"
+      ],
+      "sourceDirections": [
+        90,
+        90
+      ],
+      "flipHorizontal": [
+        true,
+        false
+      ],
+      "fps": 16,
+      "sourceCrop": [
+        22,
+        6,
+        42,
+        57
+      ],
+      "pivot": [
+        12,
+        32
+      ],
+      "job": "engineer",
+      "contentHeight": 32
+    },
+    "engineer-airborne": {
+      "cell": [
+        24,
+        32
+      ],
+      "contentHeight": 32,
+      "pivot": [
+        12,
+        32
+      ],
+      "job": "engineer",
+      "sourceFrame": "voxel/frames/dir-00-frame-00.png",
+      "motion": "runtime articulated arms, legs and torso",
+      "headBottom": 7,
+      "hips": 22,
+      "torso": [
+        9,
+        15
+      ]
+    },
+    "ufo": {
+      "cell": [
+        44,
+        20
+      ],
+      "columns": 16,
+      "rows": 8,
+      "frames": 128,
+      "fps": 24,
+      "pivot": [
+        22,
+        10
+      ],
+      "source": "assets/generated/iron-night-forge-v1/approved-ufo",
+      "cardinalSymmetry": 4
+    },
+    "rocket": {
+      "cell": [
+        12,
+        24
+      ],
+      "pivot": [
+        6,
+        12
+      ],
+      "heading": "up"
+    },
+    "factory": {
+      "maxSize": [
+        64,
+        64
+      ],
+      "pivot": "bottom center",
+      "direction": 0
+    },
+    "water-tower": {
+      "maxSize": [
+        48,
+        80
+      ],
+      "pivot": "bottom center",
+      "direction": 0
+    },
+    "city-tower": {
+      "maxSize": [
+        32,
+        104
+      ],
+      "pivot": "bottom center",
+      "direction": 0
+    }
+  }
+}
