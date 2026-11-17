@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>WarHook: UFO Abduction</title>
+    <title>Total Abduction</title>
     <base href="./" />
     <link href="css/app.css" rel="stylesheet" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
@@ -42,11 +42,20 @@
 
     <script>
         // Browser bridges used by the game ([JSImport] targets).
-        window.warhookInterop = {
+        window.totalAbductionInterop = {
             loadSave: function (key) { return localStorage.getItem(key); },
             saveSave: function (key, json) { localStorage.setItem(key, json); },
             finishStartupSplash: function () { document.body.classList.remove('startup-splash'); },
-            setUpgradeView: function (active) { document.body.classList.toggle('upgrade-view', active); }
+            setUpgradeView: function (active) { document.body.classList.toggle('upgrade-view', active); },
+            setConsoleView: function (active, left, top, width, height) {
+                document.body.classList.toggle('console-grid', active);
+                var button = document.getElementById('fullscreenButton');
+                if (!button) return;
+                button.style.setProperty('--console-fullscreen-left', left + 'px');
+                button.style.setProperty('--console-fullscreen-top', top + 'px');
+                button.style.setProperty('--console-fullscreen-width', width + 'px');
+                button.style.setProperty('--console-fullscreen-height', height + 'px');
+            }
         };
 
         // Wrap AudioContext so the game's context (created before any user
@@ -62,7 +71,7 @@
             }
             PatchedAudioContext.prototype = real.prototype;
             window.AudioContext = PatchedAudioContext;
-            window.warhookUnlockAudio = function () {
+            window.totalAbductionUnlockAudio = function () {
                 for (var i = 0; i < contexts.length; i++) {
                     try {
                         if (contexts[i].state === 'suspended') {
@@ -138,7 +147,7 @@
             var audioGestureSeen = false;
             var unlock = function () {
                 audioGestureSeen = true;
-                if (window.warhookUnlockAudio) window.warhookUnlockAudio();
+                if (window.totalAbductionUnlockAudio) window.totalAbductionUnlockAudio();
                 if (window.theInstance)
                     window.theInstance.invokeMethod('UnlockAudioDotNet');
             };

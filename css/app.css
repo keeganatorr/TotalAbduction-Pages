@@ -172,6 +172,32 @@ body.upgrade-view #fullscreenButton .fullscreen-icon {
     height: 18px;
 }
 
+/* Console graphics draw this control in their native framebuffer. Retain the
+   browser button as an accessible, trusted fullscreen gesture target only. */
+body.console-grid #theCanvas {
+    image-rendering: pixelated;
+}
+
+body.console-grid #fullscreenButton {
+    left: var(--console-fullscreen-left);
+    top: var(--console-fullscreen-top);
+    right: auto;
+    bottom: auto;
+    width: var(--console-fullscreen-width);
+    height: var(--console-fullscreen-height);
+    box-sizing: border-box;
+    border: 0;
+    padding: 0;
+    opacity: 0;
+    outline: none;
+}
+
+body.console-grid #fullscreenButton:hover,
+body.console-grid #fullscreenButton:focus-visible {
+    background: transparent;
+    outline: none;
+}
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;

@@ -7,7 +7,7 @@
         ['ShiftLeft', 128], ['ShiftRight', 256],
         ['ArrowLeft', 512], ['ArrowRight', 1024], ['ArrowUp', 2048], ['ArrowDown', 4096],
         ['Backslash', 8192], ['IntlBackslash', 8192],
-        ['Minus', 16384], ['Equal', 32768], ['NumpadAdd', 65536]
+        ['Minus', 16384], ['Equal', 32768], ['NumpadAdd', 65536], ['F9', 131072]
     ]);
     const held = new Set();
 
@@ -18,6 +18,7 @@
         if (event.key === '-') return 'Minus';
         if (event.key === '+' || event.key === '=') return 'Equal';
         if (event.key === '\\' || event.key === '|') return 'Backslash';
+        if (event.key === 'F9') return 'F9';
         if (event.key === 'Shift') return event.location === 2 ? 'ShiftRight' : 'ShiftLeft';
         if (event.key && event.key.startsWith('Arrow')) return event.key;
         return event.key && event.key.length === 1 ? 'Key' + event.key.toUpperCase() : '';
@@ -50,7 +51,7 @@
         if (document.visibilityState !== 'visible') held.clear();
     });
 
-    window.warhookControls = {
+    window.totalAbductionControls = {
         physicalKeys: function () {
             let mask = 0;
             for (const code of held) mask |= bindings.get(code);
